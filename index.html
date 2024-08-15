@@ -43,11 +43,11 @@
             </div>
     
         <footer>
-          <button class="is-undo" aria-label="undo"></button>
-          <button class="is-remove is-big" aria-label="remove"></button>
-          <button class="is-star" aria-label="star"></button>
-          <button class="is-fav is-big" aria-label="fav"></button>
-          <button class="is-zap" aria-label="zap"></button>
+          <button id="undoButton" class="is-undo" aria-label="undo"></button>
+          <button id="removeButton" class="is-remove is-big" aria-label="remove"></button>
+          <button id="starButton" class="is-star" aria-label="star"></button>
+          <button id="favButton" class="is-fav is-big" aria-label="fav"></button>
+          <button id="zapButton" class="is-zap" aria-label="zap"></button>
         </footer>
       </section>
     </main>
@@ -362,7 +362,55 @@
           .forEach((el) => (el.style.opacity = 0));
       }
     }
-  
     document.addEventListener('mousedown', startDrag)
     document.addEventListener('touchstart', startDrag, { passive: true })
+
+
   </script>
+
+  <script>
+    document.getElementById('undoButton').addEventListener('click', function() {
+        location.reload();
+    });
+  </script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const DECISION_THRESHOLD = 75;
+  let isAnimating = false;
+  
+  const removeButton = document.getElementById('removeButton');
+  const favButton = document.getElementById('favButton');
+  
+  function triggerSwipe(direction) {
+    if (isAnimating) return;
+
+    const cards = document.querySelectorAll('article');
+    const actualCard = cards[cards.length - 1];
+
+    if (!actualCard) return;
+
+    isAnimating = true;
+
+    const transformValue = direction === 'left' ? 'translateX(-100vw) rotate(-15deg)' : 'translateX(100vw) rotate(15deg)';
+    actualCard.style.transform = transformValue;
+    actualCard.classList.add(direction === 'left' ? 'go-left' : 'go-right');
+    actualCard.querySelectorAll('.choice').forEach(choice => {
+      choice.style.opacity = 0;
+    });
+
+    actualCard.addEventListener('transitionend', () => {
+      actualCard.remove();
+      isAnimating = false;
+    });
+  }
+
+  removeButton.addEventListener('click', () => triggerSwipe('left'));
+  favButton.addEventListener('click', () => triggerSwipe('right'));
+});
+
+  </script>
+
+
+  
+  
